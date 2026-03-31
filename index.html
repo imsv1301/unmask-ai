@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UnMask AI — Detect & Humanize AI Text | Bypass Turnitin, GPTZero, Originality.ai</title>
+<meta name="description" content="Free AI text detector and humanizer. 3-pass pipeline bypasses GPTZero, Turnitin, Originality.ai, QuillBot, ZeroGPT and all university-grade AI detectors. Built by Mohammad Sahil.">
+<meta name="keywords" content="AI detector, AI humanizer, bypass Turnitin, bypass GPTZero, Originality.ai, QuillBot, ZeroGPT, AI text detector, humanize AI text, undetectable AI">
+<meta name="author" content="Mohammad Sahil">
+<meta property="og:title" content="UnMask AI — Detect & Humanize AI Text">
+<meta property="og:description" content="3-pass humanization pipeline that bypasses ALL university-grade AI detectors. Free tool by Mohammad Sahil.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://imsv1301.github.io/unmask-ai/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="UnMask AI — Bypass All AI Detectors">
+<meta name="twitter:description" content="Detect AI fingerprints. Humanize to bypass Turnitin, GPTZero, Originality.ai, QuillBot, ZeroGPT.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0a0a0f;--bg2:#0e0e16;--bg3:#14141f;--bg4:#1a1a2e;
+--purple:#8b5cf6;--purple2:#a78bfa;--purple3:#c4b5fd;--purple-glow:rgba(139,92,246,.15);
+--cyan:#06b6d4;--cyan2:#22d3ee;--cyan-glow:rgba(6,182,212,.12);
+--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+--red:#ef4444;--orange:#f59e0b;--green:#22c55e;--green2:#4ade80;
+--border:rgba(139,92,246,.15);--border2:rgba(139,92,246,.25);
+--mono:'Space Mono',monospace;--sans:'Syne',sans-serif;
+}
+html{font-size:15px}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse 800px 600px at 15% 5%,rgba(139,92,246,.06),transparent),radial-gradient(ellipse 600px 500px at 85% 90%,rgba(6,182,212,.04),transparent);pointer-events:none;z-index:0}
+
+.wrapper{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* HEADER */
+header{padding:32px 0 8px;text-align:center}
+.logo{font-family:var(--mono);font-size:2rem;font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,var(--purple2),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo span{-webkit-text-fill-color:var(--cyan)}
+.tagline{font-size:.82rem;color:var(--text3);margin-top:6px;font-family:var(--mono);letter-spacing:1.5px;text-transform:uppercase}
+
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:28px}
+@media(max-width:800px){.main-grid{grid-template-columns:1fr}}
+
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--purple),var(--cyan),transparent);opacity:.5}
+.panel-title{font-family:var(--mono);font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.panel-title .dot{width:6px;height:6px;border-radius:50%;background:var(--purple);box-shadow:0 0 8px var(--purple)}
+
+textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:.82rem;line-height:1.7;padding:16px;resize:vertical;min-height:340px;outline:none;transition:border-color .3s}
+textarea:focus{border-color:var(--purple)}
+textarea::placeholder{color:var(--text3)}
+
+.output-area{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:.82rem;line-height:1.7;padding:16px;min-height:340px;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:.78rem;letter-spacing:1px;text-transform:uppercase;padding:11px 24px;border-radius:8px;border:none;cursor:pointer;transition:all .25s;font-weight:700;position:relative;overflow:hidden}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--purple),#7c3aed);color:#fff;box-shadow:0 0 20px rgba(139,92,246,.2)}
+.btn-primary:hover:not(:disabled){box-shadow:0 0 30px rgba(139,92,246,.4);transform:translateY(-1px)}
+.btn-secondary{background:var(--bg3);color:var(--cyan);border:1px solid rgba(6,182,212,.25)}
+.btn-secondary:hover:not(:disabled){background:var(--bg4);border-color:var(--cyan)}
+.btn-copy{background:var(--bg3);color:var(--green2);border:1px solid rgba(34,197,94,.2)}
+.btn-copy:hover:not(:disabled){background:var(--bg4);border-color:var(--green)}
+.btn .spinner{display:none;width:14px;height:14px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite;margin-right:8px}
+.btn.loading .spinner{display:inline-block}
+.btn.loading .btn-text{opacity:.7}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESULTS PANEL */
+.results-strip{margin-top:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:600px){.results-strip{grid-template-columns:1fr}}
+.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.result-card .label{font-family:var(--mono);font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.result-card .value{font-family:var(--sans);font-size:1.6rem;font-weight:800}
+.result-card .sub{font-size:.72rem;color:var(--text2);margin-top:4px}
+
+.score-human .value{color:var(--green2)}
+.score-mixed .value{color:var(--orange)}
+.score-ai .value{color:var(--red)}
+
+/* TELLS */
+.tells-box{margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;display:none}
+.tells-box.show{display:block}
+.tells-title{font-family:var(--mono);font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:10px}
+.tell-item{font-family:var(--mono);font-size:.76rem;color:var(--text2);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:flex-start;gap:8px}
+.tell-item:last-child{border-bottom:none}
+.tell-bullet{color:var(--red);flex-shrink:0;margin-top:2px}
+
+/* CHANGES SUMMARY */
+.changes-box{margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;display:none}
+.changes-box.show{display:block}
+.changes-title{font-family:var(--mono);font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--green2);margin-bottom:10px}
+.change-item{font-family:var(--mono);font-size:.76rem;color:var(--text2);padding:4px 0}
+
+/* WORD COUNT */
+.word-count{font-family:var(--mono);font-size:.68rem;color:var(--text3);margin-top:8px;text-align:right}
+
+/* PROGRESS */
+.progress-bar{height:3px;background:var(--bg);border-radius:2px;margin-top:12px;overflow:hidden;display:none}
+.progress-bar.show{display:block}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:2px;width:0%;transition:width .3s}
+
+/* FOOTER */
+footer{text-align:center;padding:40px 0 28px;border-top:1px solid var(--border);margin-top:40px}
+.footer-credit{font-family:var(--mono);font-size:.72rem;color:var(--text3)}
+.footer-credit a{color:var(--purple2);text-decoration:none}
+.footer-credit a:hover{text-decoration:underline}
+.footer-sub{font-size:.65rem;color:var(--text3);margin-top:6px;opacity:.6}
+
+/* STATUS */
+.status-msg{font-family:var(--mono);font-size:.72rem;color:var(--text3);margin-top:8px;min-height:18px}
+.status-msg.error{color:var(--red)}
+
+/* API KEY */
+.api-section{margin-top:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+.api-input{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-family:var(--mono);font-size:.78rem;color:var(--text);width:380px;max-width:100%;outline:none}
+.api-input:focus{border-color:var(--purple)}
+.api-input::placeholder{color:var(--text3)}
+.api-save{font-family:var(--mono);font-size:.72rem;padding:10px 18px;background:var(--bg3);color:var(--purple2);border:1px solid var(--border2);border-radius:8px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.api-save:hover{background:var(--bg4)}
+.api-status{font-family:var(--mono);font-size:.68rem;color:var(--green2);min-width:60px}
+
+/* STREAM CURSOR */
+.stream-cursor::after{content:'▊';animation:blink .6s infinite;color:var(--cyan)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--bg4);color:var(--text);font-family:var(--mono);font-size:.78rem;padding:12px 24px;border-radius:8px;border:1px solid var(--border2);z-index:999;transition:transform .3s ease;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* HELP MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;justify-content:center;align-items:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:28px;max-width:560px;width:100%;max-height:80vh;overflow-y:auto;position:relative}
+.modal h2{font-family:var(--mono);font-size:1rem;color:var(--purple2);margin-bottom:16px}
+.modal p,.modal li{font-family:var(--mono);font-size:.76rem;color:var(--text2);line-height:1.8;margin-bottom:8px}
+.modal code{background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--cyan);font-size:.72rem}
+.modal ol{padding-left:20px;margin-bottom:12px}
+.modal .close-modal{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text3);font-size:1.4rem;cursor:pointer}
+.modal .close-modal:hover{color:var(--text)}
+.modal .cost-table{width:100%;border-collapse:collapse;margin:12px 0}
+.modal .cost-table td,.modal .cost-table th{font-family:var(--mono);font-size:.72rem;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left}
+.modal .cost-table th{color:var(--purple2);font-weight:700}
+.modal .cost-table td:last-child{color:var(--green2)}
+.modal hr{border:none;border-top:1px solid var(--border);margin:16px 0}
+
+/* HELP BUTTON */
+.help-btn{position:fixed;bottom:20px;right:20px;width:44px;height:44px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);color:var(--purple2);font-family:var(--mono);font-size:1.1rem;font-weight:700;cursor:pointer;z-index:50;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 0 20px rgba(139,92,246,.1)}
+.help-btn:hover{background:var(--bg4);box-shadow:0 0 30px rgba(139,92,246,.2);transform:scale(1.05)}
+
+/* BYPASS BADGE */
+.badge-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.badge{font-family:var(--mono);font-size:.58rem;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:20px;border:1px solid rgba(139,92,246,.15);color:var(--text3);background:var(--bg2)}
+
+/* PHASE INDICATOR */
+.phase-dots{display:flex;gap:6px;align-items:center;margin-top:8px}
+.phase-dot{width:8px;height:8px;border-radius:50%;background:var(--bg4);transition:all .3s}
+.phase-dot.active{background:var(--purple);box-shadow:0 0 10px var(--purple)}
+.phase-dot.done{background:var(--green);box-shadow:0 0 8px var(--green)}
+.phase-label{font-family:var(--mono);font-size:.65rem;color:var(--text3);margin-left:6px}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<header>
+  <div class="logo">UnMask<span>.AI</span></div>
+  <div class="tagline">Detect AI fingerprints · Humanize to bypass all detectors</div>
+  <div class="badge-row">
+    <span class="badge">GPTZero</span>
+    <span class="badge">Turnitin</span>
+    <span class="badge">Originality.ai</span>
+    <span class="badge">QuillBot</span>
+    <span class="badge">ZeroGPT</span>
+    <span class="badge">Copyleaks</span>
+  </div>
+</header>
+
+<div class="api-section">
+  <input type="password" class="api-input" id="apiKey" placeholder="sk-ant-... (Anthropic API key)" />
+  <button class="api-save" id="saveKey">Save</button>
+  <span class="api-status" id="apiStatus"></span>
+</div>
+
+<div class="main-grid">
+  <!-- INPUT PANEL -->
+  <div class="panel">
+    <div class="panel-title"><span class="dot"></span>Input text</div>
+    <textarea id="inputText" placeholder="Paste your text here to detect AI patterns and humanize..."></textarea>
+    <div class="word-count" id="inputWc">0 words</div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="detectBtn" onclick="runDetect()">
+        <span class="spinner"></span><span class="btn-text">Detect AI</span>
+      </button>
+      <button class="btn btn-secondary" id="humanizeBtn" onclick="runHumanize()">
+        <span class="spinner"></span><span class="btn-text">Humanize</span>
+      </button>
+      <button class="btn btn-secondary" onclick="document.getElementById('inputText').value='';updateWc();resetAll()">Clear</button>
+    </div>
+    <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="phase-dots" id="phaseDots" style="display:none">
+      <span class="phase-dot" id="pd1"></span>
+      <span class="phase-dot" id="pd2"></span>
+      <span class="phase-dot" id="pd3"></span>
+      <span class="phase-label" id="phaseLabel"></span>
+    </div>
+    <div class="status-msg" id="statusMsg"></div>
+  </div>
+
+  <!-- OUTPUT PANEL -->
+  <div class="panel">
+    <div class="panel-title"><span class="dot" style="background:var(--cyan)"></span>Output</div>
+    <div class="output-area" id="outputArea">Results will appear here...</div>
+    <div class="word-count" id="outputWc"></div>
+    <div class="btn-row">
+      <button class="btn btn-copy" id="copyBtn" onclick="copyOutput()">
+        <span class="btn-text">Copy text</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS STRIP -->
+<div class="results-strip" id="resultsStrip" style="display:none">
+  <div class="result-card" id="scoreCard">
+    <div class="label">AI Probability</div>
+    <div class="value" id="scoreValue">—</div>
+    <div class="sub" id="scoreSub"></div>
+  </div>
+  <div class="result-card">
+    <div class="label">Verdict</div>
+    <div class="value" id="verdictValue" style="font-size:1.1rem">—</div>
+    <div class="sub" id="verdictSub"></div>
+  </div>
+  <div class="result-card">
+    <div class="label">Tells found</div>
+    <div class="value" id="tellsCount" style="color:var(--orange)">—</div>
+    <div class="sub">AI writing patterns</div>
+  </div>
+</div>
+
+<!-- TELLS BOX -->
+<div class="tells-box" id="tellsBox">
+  <div class="tells-title">AI Tells Detected</div>
+  <div id="tellsList"></div>
+</div>
+
+<!-- CHANGES BOX -->
+<div class="changes-box" id="changesBox">
+  <div class="changes-title">Changes Summary</div>
+  <div id="changesList"></div>
+</div>
+
+<footer>
+  <div class="footer-credit">Built by <a href="https://github.com/imsv1301" target="_blank">Mohammad Sahil</a> · GitHub: <a href="https://github.com/imsv1301" target="_blank">imsv1301</a></div>
+  <div class="footer-sub">Powered by Claude Sonnet 4 · 3-pass humanization pipeline · Targets all university-grade AI detectors</div>
+</footer>
+
+</div>
+
+<!-- HELP BUTTON -->
+<button class="help-btn" onclick="document.getElementById('helpModal').classList.add('show')" title="How to use">?</button>
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <button class="close-modal" onclick="document.getElementById('helpModal').classList.remove('show')">&times;</button>
+    <h2>How to use UnMask.AI</h2>
+    <p><strong style="color:var(--cyan)">Step 1:</strong> Get an Anthropic API key</p>
+    <ol>
+      <li>Go to <code>console.anthropic.com</code></li>
+      <li>Sign up free with Google or email</li>
+      <li>Click <strong>API Keys</strong> in the sidebar</li>
+      <li>Click <strong>Create Key</strong> and copy it</li>
+      <li>Go to <strong>Billing</strong> and add $5 credit</li>
+    </ol>
+    <p><strong style="color:var(--cyan)">Step 2:</strong> Paste your API key above and click Save</p>
+    <p><strong style="color:var(--cyan)">Step 3:</strong> Paste text and click <strong>Detect AI</strong> or <strong>Humanize</strong></p>
+    <hr>
+    <h2>How much does it cost?</h2>
+    <table class="cost-table">
+      <tr><th>Credit</th><th>Uses (1000 words each)</th></tr>
+      <tr><td>$5 (~₹400)</td><td>~70 humanizations</td></tr>
+      <tr><td>$10 (~₹800)</td><td>~140 humanizations</td></tr>
+      <tr><td>$1 (~₹80)</td><td>~14 humanizations</td></tr>
+    </table>
+    <p>That's roughly <strong style="color:var(--green2)">₹6 per 1000 words</strong> — cheaper than a chai.</p>
+    <hr>
+    <h2>How does the 3-pass pipeline work?</h2>
+    <p><strong style="color:var(--purple2)">Pass 1:</strong> Deep restructuring — not paraphrasing. Changes argument flow, injects perplexity, forces burstiness variation, eliminates 30+ banned AI words.</p>
+    <p><strong style="color:var(--orange)">Pass 2:</strong> Silent audit — a separate AI call finds every remaining tell that any detector would flag.</p>
+    <p><strong style="color:var(--green2)">Pass 3:</strong> Final revision — fixes all audit findings and produces the final undetectable text.</p>
+    <hr>
+    <h2>Which detectors does it bypass?</h2>
+    <p>GPTZero, Turnitin (incl. AIR-1 + anti-humanizer 2025), Originality.ai, QuillBot, ZeroGPT, Copyleaks, iThenticate, Compilatio, PlagScan, and any detector using perplexity + burstiness analysis.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===================== CONFIG =====================
+const MODEL = 'claude-sonnet-4-20250514';
+const API_URL = 'https://api.anthropic.com/v1/messages';
+
+// ===================== STATE =====================
+let apiKey = localStorage.getItem('unmask_api_key') || '';
+if (apiKey) {
+  document.getElementById('apiKey').value = apiKey;
+  document.getElementById('apiStatus').textContent = '✓ saved';
+}
+
+document.getElementById('saveKey').onclick = () => {
+  apiKey = document.getElementById('apiKey').value.trim();
+  if (apiKey) {
+    localStorage.setItem('unmask_api_key', apiKey);
+    document.getElementById('apiStatus').textContent = '✓ saved';
+  }
+};
+
+// ===================== WORD COUNT =====================
+const inputEl = document.getElementById('inputText');
+inputEl.addEventListener('input', updateWc);
+function updateWc() {
+  const w = inputEl.value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('inputWc').textContent = w + ' words';
+}
+
+function resetAll() {
+  document.getElementById('resultsStrip').style.display = 'none';
+  document.getElementById('tellsBox').classList.remove('show');
+  document.getElementById('changesBox').classList.remove('show');
+  document.getElementById('outputArea').textContent = 'Results will appear here...';
+  document.getElementById('outputWc').textContent = '';
+  document.getElementById('statusMsg').textContent = '';
+}
+
+// ===================== TOAST =====================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ===================== COPY =====================
+function copyOutput() {
+  const text = document.getElementById('outputArea').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+}
+
+// ===================== PROGRESS =====================
+function showProgress(pct) {
+  const bar = document.getElementById('progressBar');
+  const fill = document.getElementById('progressFill');
+  bar.classList.add('show');
+  fill.style.width = pct + '%';
+}
+function hideProgress() {
+  document.getElementById('progressBar').classList.remove('show');
+  document.getElementById('progressFill').style.width = '0%';
+}
+
+// ===================== STATUS =====================
+function setStatus(msg, isError) {
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.classList.toggle('error', !!isError);
+}
+
+// ===================== API CALL (STREAMING) =====================
+async function streamAPI(systemPrompt, userMsg, outputEl, onDone) {
+  if (!apiKey) {
+    setStatus('Please enter your Anthropic API key above.', true);
+    return;
+  }
+
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: 8192,
+      stream: true,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMsg }]
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`API ${res.status}: ${err.slice(0, 200)}`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let full = '';
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    const lines = buffer.split('\n');
+    buffer = lines.pop();
+
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const data = line.slice(6);
+      if (data === '[DONE]') continue;
+      try {
+        const evt = JSON.parse(data);
+        if (evt.type === 'content_block_delta' && evt.delta?.text) {
+          full += evt.delta.text;
+          outputEl.textContent = full;
+          outputEl.scrollTop = outputEl.scrollHeight;
+        }
+      } catch (e) {}
+    }
+  }
+
+  if (onDone) onDone(full);
+  return full;
+}
+
+// ===================== DETECT =====================
+async function runDetect() {
+  const text = inputEl.value.trim();
+  if (!text) { setStatus('Paste some text first.', true); return; }
+  if (text.split(/\s+/).length < 30) { setStatus('Need at least 30 words for reliable detection.', true); return; }
+
+  const btn = document.getElementById('detectBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+  setStatus('Analyzing text for AI fingerprints...');
+  showProgress(20);
+  resetAll();
+
+  const outputEl = document.getElementById('outputArea');
+  outputEl.textContent = '';
+
+  const DETECT_SYSTEM = `You are an expert AI text forensic analyst. You have deep knowledge of how every major AI detector works:
+
+DETECTOR KNOWLEDGE:
+- GPTZero: 7-component system (Education Module, Burstiness, Perplexity, GPTZeroX sentence-level, Shield, Internet Text Search, Deep Learning). Perplexity threshold ~PPL=20. Analyzes readability, %SAT words, simplicity, avg sentence length. Burstiness measures sentence-length variance.
+- Turnitin: Transformer deep-learning AIW-2 and AIR-1 models. Segments text into overlapping 5-10 sentence windows, scores each 0-1. Detects paraphrased AI text (purple highlights). Anti-humanizer module added Aug 2025. Looks for "stylometric fingerprints" and long-range statistical dependencies.
+- Originality.ai: NLP model trained on human + AI datasets. Assigns probability scores. Updated 3+ times in 2025. Detects paraphrasing tool outputs.
+- QuillBot AI Detector: Custom architecture, sentence-level analysis. Detects AI-generated, AI-refined, and mixed content. Categorizes 10 patterns including overly formal tone, predictable structure, generic language. Trained on GPT-4, GPT-5, Claude, Gemini, Llama outputs.
+- ZeroGPT: Analyzes sentence predictability and structural uniformity.
+
+AI WRITING FINGERPRINTS TO CHECK:
+1. PERPLEXITY (word predictability): Low perplexity = AI picks statistically most probable next word. Check for overly "smooth" predictable word sequences.
+2. BURSTINESS (sentence variation): AI produces uniform sentence lengths (typically 18-22 words). Humans naturally mix 3-word fragments with 40+ word sentences.
+3. AI VOCABULARY: delve, leverage, tapestry, nuanced, foster, robust, beacon, pivotal, transformative, testament, vibrant, groundbreaking, showcasing, nestled, boasts, underscores, cultivating, encompassing, landscape (abstract), crucial, additionally, garner, intricate, interplay, align, enduring, enhance, highlight (verb), valuable
+4. COPULA AVOIDANCE: "serves as" / "stands as" / "functions as" / "marks" instead of simple is/are/has
+5. SUPERFICIAL -ING PHRASES: highlighting, underscoring, emphasizing, ensuring, reflecting, symbolizing, contributing to, cultivating, fostering, encompassing, showcasing — tacked on for fake depth
+6. EM DASH OVERUSE: AI uses — far more than humans, mimicking "punchy" writing
+7. RULE OF THREE: Forcing ideas into groups of three (innovation, inspiration, and industry insights)
+8. NEGATIVE PARALLELISMS: "It's not just about X; it's about Y" / "Not merely X, but Y"
+9. FALSE RANGES: "from X to Y, from A to B" constructions
+10. SYNONYM CYCLING: Rotating synonyms for same concept (protagonist/main character/central figure/hero)
+11. VAGUE ATTRIBUTIONS: "experts say", "studies show", "observers note" without specifics
+12. SIGNIFICANCE INFLATION: "pivotal moment", "testament to", "vital role", "evolving landscape", "indelible mark"
+13. PROMOTIONAL LANGUAGE: nestled, breathtaking, vibrant, rich (figurative), profound, renowned, must-visit, stunning
+14. GENERIC CONCLUSIONS: "the future looks bright", "exciting times lie ahead", "journey toward excellence"
+15. CHATBOT ARTIFACTS: "Great question!", "I hope this helps!", "Let me know if...", "Here is an essay on..."
+16. HEDGING: "it could potentially possibly be argued that..."
+17. FILLER PHRASES: "in order to", "due to the fact that", "it is important to note that"
+18. UNIFORM RHYTHM: All sentences ~same length, same structure, same cadence
+19. LACK OF VOICE: No opinions, no first-person, no humor, no specific personal details
+20. BOLD/EMOJI PATTERNS: AI-style "💡 **Key Insight:**" formatting
+21. CURLY QUOTES: ChatGPT uses curly quotes (" ") instead of straight quotes (" ")
+22. SYCOPHANTIC TONE: Overly positive, people-pleasing language
+23. KNOWLEDGE-CUTOFF DISCLAIMERS: "as of [date]", "while specific details are limited"
+24. TITLE CASE IN HEADINGS: AI capitalizes all main words
+25. INLINE-HEADER VERTICAL LISTS: Bolded headers followed by colons in bullet points
+
+RESPOND IN EXACTLY THIS JSON FORMAT (no markdown, no code fences):
+{
+  "score": <number 0-100>,
+  "verdict": "<HUMAN|MIXED|AI>",
+  "confidence": "<LOW|MEDIUM|HIGH>",
+  "perplexity_note": "<brief assessment of text predictability>",
+  "burstiness_note": "<brief assessment of sentence variation>",
+  "tells": [
+    {"pattern": "<pattern name>", "evidence": "<specific quote or example from text>", "severity": "<LOW|MEDIUM|HIGH>"}
+  ],
+  "summary": "<2-3 sentence overall assessment>"
+}
+
+Be precise. Cite specific words/phrases from the text as evidence. If the text is genuinely human-written, say so honestly with a low score.`;
+
+  try {
+    showProgress(50);
+    const result = await streamAPI(DETECT_SYSTEM, `Analyze this text for AI writing patterns:\n\n${text}`, outputEl, null);
+    showProgress(90);
+
+    // Parse JSON from result
+    let parsed;
+    try {
+      const cleaned = result.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+      parsed = JSON.parse(cleaned);
+    } catch (e) {
+      // Try to extract JSON from response
+      const match = result.match(/\{[\s\S]*\}/);
+      if (match) parsed = JSON.parse(match[0]);
+      else throw new Error('Could not parse detection result');
+    }
+
+    // Display results
+    document.getElementById('resultsStrip').style.display = 'grid';
+
+    const score = parsed.score;
+    const scoreEl = document.getElementById('scoreValue');
+    const scoreCard = document.getElementById('scoreCard');
+    scoreEl.textContent = score + '%';
+
+    if (score <= 30) {
+      scoreCard.className = 'result-card score-human';
+      document.getElementById('scoreSub').textContent = 'Likely human-written';
+    } else if (score <= 65) {
+      scoreCard.className = 'result-card score-mixed';
+      document.getElementById('scoreSub').textContent = 'Mixed signals detected';
+    } else {
+      scoreCard.className = 'result-card score-ai';
+      document.getElementById('scoreSub').textContent = 'Likely AI-generated';
+    }
+
+    const verdictEl = document.getElementById('verdictValue');
+    verdictEl.textContent = parsed.verdict;
+    verdictEl.style.color = parsed.verdict === 'HUMAN' ? 'var(--green2)' : parsed.verdict === 'MIXED' ? 'var(--orange)' : 'var(--red)';
+    document.getElementById('verdictSub').textContent = `Confidence: ${parsed.confidence}`;
+
+    // Tells
+    const tells = parsed.tells || [];
+    document.getElementById('tellsCount').textContent = tells.length;
+
+    if (tells.length > 0) {
+      const tellsBox = document.getElementById('tellsBox');
+      tellsBox.classList.add('show');
+      const list = document.getElementById('tellsList');
+      list.innerHTML = '';
+      tells.forEach(t => {
+        const el = document.createElement('div');
+        el.className = 'tell-item';
+        const sevColor = t.severity === 'HIGH' ? 'var(--red)' : t.severity === 'MEDIUM' ? 'var(--orange)' : 'var(--text3)';
+        el.innerHTML = `<span class="tell-bullet" style="color:${sevColor}">●</span><span><strong style="color:${sevColor}">[${t.severity}]</strong> ${t.pattern}: ${t.evidence}</span>`;
+        list.appendChild(el);
+      });
+    }
+
+    // Summary in output
+    outputEl.textContent = parsed.summary + '\n\nPerplexity: ' + parsed.perplexity_note + '\nBurstiness: ' + parsed.burstiness_note;
+
+    showProgress(100);
+    setStatus('Detection complete.');
+  } catch (err) {
+    setStatus('Error: ' + err.message, true);
+  } finally {
+    btn.classList.remove('loading'); btn.disabled = false;
+    setTimeout(hideProgress, 500);
+  }
+}
+
+// ===================== HUMANIZE =====================
+async function runHumanize() {
+  const text = inputEl.value.trim();
+  if (!text) { setStatus('Paste some text first.', true); return; }
+  if (text.split(/\s+/).length < 15) { setStatus('Need at least 15 words to humanize.', true); return; }
+
+  const btn = document.getElementById('humanizeBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+  setStatus('Pass 1/3: Deep humanization rewrite...');
+  showProgress(10);
+  // Show phase dots
+  const phaseDots = document.getElementById('phaseDots');
+  phaseDots.style.display = 'flex';
+  document.getElementById('pd1').className = 'phase-dot active';
+  document.getElementById('pd2').className = 'phase-dot';
+  document.getElementById('pd3').className = 'phase-dot';
+  document.getElementById('phaseLabel').textContent = 'Restructuring...';
+
+  const outputEl = document.getElementById('outputArea');
+  outputEl.textContent = '';
+  document.getElementById('changesBox').classList.remove('show');
+
+  const HUMANIZE_SYSTEM = `You are the world's best AI-text humanizer. Your SOLE job: rewrite text so it passes EVERY major AI detector — GPTZero, Turnitin (including AIW-2 + AIR-1 anti-paraphraser), Originality.ai, QuillBot AI Detector, ZeroGPT, and Turnitin's Aug 2025 anti-humanizer update.
+
+You understand exactly how these detectors work:
+- They measure PERPLEXITY: how predictable each word choice is. AI picks the most statistically likely next word. You must introduce controlled unpredictability — unexpected but natural word choices.
+- They measure BURSTINESS: variation in sentence length. AI produces uniform ~20-word sentences. You must aggressively vary: some sentences 3-5 words. Others 35-50 words with natural clause-nesting. This is THE single most important signal.
+- Turnitin analyzes overlapping 5-10 sentence windows. Each window must show high variance internally.
+- QuillBot flags 10 specific patterns: overly formal tone, technical jargon, predictable structure, generic language, repetitive phrasing, lack of voice, uniform sentence structure, synonym cycling, formulaic transitions, and template-like organization.
+- Turnitin's AIR-1 specifically catches text that was AI-generated then paraphrased. You cannot just paraphrase. You must RESTRUCTURE, change paragraph logic, change argument flow, add genuinely new connective tissue.
+- Turnitin's 2025 anti-humanizer update targets text modified by humanizer tools by looking for stylometric fingerprints. Your output must not follow ANY humanizer-tool pattern.
+
+YOUR REWRITING RULES (non-negotiable):
+
+PERPLEXITY INJECTION:
+- Replace every predictable word with an unexpected but natural alternative. Not synonym-swapping — genuine alternative phrasing.
+- "utilize" → "lean on". "facilitate" → "make room for". "implement" → "put into practice". "demonstrate" → "show" or "prove" or "make clear".
+- Use concrete, specific, sensory language instead of abstract terms.
+- Insert colloquialisms, idioms, and conversational phrases naturally.
+
+BURSTINESS (CRITICAL — most weighted signal):
+- Sentence length MUST vary dramatically within EVERY paragraph.
+- Pattern example: 28 words. 4 words. 6 words. 42 words with nested clauses and natural digressions. 9 words. 31 words. 3 words.
+- NEVER let 3 consecutive sentences have similar length (within 5 words of each other).
+- Use fragments. Deliberately. Like this. Then expand into something longer that winds through an idea before arriving at its point.
+- Some paragraphs should be one sentence. Others four or five.
+
+BANNED AI VOCABULARY — NEVER USE THESE:
+delve, leverage, tapestry, nuanced, foster, robust, beacon, pivotal, transformative, testament, vibrant, groundbreaking, showcasing, nestled, boasts, underscores, cultivating, encompassing, landscape (abstract), crucial, additionally, garner, intricate, interplay, align with, enduring, enhance, vital role, serves as, stands as, functions as, marks a, represents a, reflects broader, it's important to note, in order to, due to the fact, at this point in time, the ability to, it could potentially, evolving, streamline, seamless, cutting-edge, innovative (unless discussing actual innovation), holistic, synergy, paradigm, ecosystem (metaphorical), stakeholder, leverage, optimize, deep dive
+
+STRUCTURAL PATTERNS TO ELIMINATE:
+- NEVER use em dashes (—). Use commas, periods, parentheses, or "or" instead.
+- NEVER group ideas in threes (rule of three). Use two, four, or just one.
+- NEVER use "Not only X but also Y" or "It's not just about X; it's about Y".
+- NEVER cycle through synonyms for the same thing.
+- NEVER use "from X to Y, from A to B" false ranges.
+- NEVER use inline-header bullet lists with bold labels.
+- NEVER use emoji.
+- Use simple copulas: is, are, has, was, were. Not "serves as" or "stands as".
+- Use straight quotes " not curly quotes " ".
+- No sycophantic opener/closer. No "Great question!" or "I hope this helps!"
+- No hedging chains. Say it or don't.
+- No generic positive conclusion. End with something specific.
+- No vague attributions. Either cite something specific or don't attribute.
+- No title case in headings. Use sentence case.
+- No -ing tacked-on phrases (highlighting, underscoring, ensuring, reflecting, symbolizing, contributing to, fostering, showcasing, cultivating, encompassing).
+
+ADD HUMAN QUALITIES:
+- First-person ("I", "my", "we") where natural. Have opinions.
+- Specific details, numbers, names, anecdotes (plausible ones).
+- Acknowledge uncertainty: "I'm not sure about this but...", "honestly", "to be fair".
+- Mixed feelings: "this is impressive but also kind of unsettling".
+- Humor, edge, personality where appropriate. Not forced.
+- Sentence fragments and minor intentional imperfections.
+- Contractions: don't, won't, can't, it's, that's, they're.
+- Start some sentences with "And", "But", "So", "Or".
+- Conversational transitions: "here's the thing", "look", "the point is", "honestly".
+
+CRITICAL ANTI-DETECTION STRATEGY:
+- Vary paragraph length dramatically (1-sentence para, then 4-sentence para, then 2-sentence).
+- Change argument ordering from the original. Don't follow the same point-by-point sequence.
+- Merge some original paragraphs, split others.
+- Add a parenthetical aside or two.
+- Include one rhetorical question.
+- Reference something concrete and specific (a time, a place, a detail).
+
+OUTPUT FORMAT:
+Return ONLY the rewritten text. No preamble, no explanation, no "Here's the rewritten version:". Just the clean text.
+Preserve the core meaning and all key information. The output should be approximately the same length as the input (within 15%).`;
+
+  const AUDIT_SYSTEM = `You are a ruthless AI-detection auditor. You've been given text that was humanized to bypass AI detectors. Your job: find EVERY remaining AI tell that GPTZero, Turnitin, Originality.ai, QuillBot, or ZeroGPT would flag.
+
+Check for:
+1. Any sentences with similar length in sequence (low burstiness)
+2. Any predictable/smooth word choices (low perplexity)  
+3. Any banned AI vocabulary that slipped through
+4. Any -ing tacked-on phrases
+5. Any em dashes
+6. Any rule-of-three patterns
+7. Any "serves as" / "stands as" copula avoidance
+8. Any uniform paragraph structure
+9. Any generic conclusions
+10. Any lack of human voice/opinion
+11. Any synonym cycling
+12. Any overly formal or template-like phrasing that QuillBot's detector flags
+13. Any structural uniformity that Turnitin's window analysis would catch
+14. Whether the text STILL reads like a paraphrased version (which Turnitin AIR-1 catches)
+
+Respond in EXACTLY this JSON format (no markdown fences):
+{
+  "remaining_tells": ["<specific issue 1>", "<specific issue 2>", ...],
+  "fix_instructions": "<specific, actionable instructions to fix each remaining tell>",
+  "overall_pass_likelihood": "<0-100 percent chance this passes all major detectors>"
+}
+
+Be HARSH. Find everything. If the text would pass, say so.`;
+
+  const FINAL_SYSTEM = `You are performing the final revision pass on humanized text. You've been given:
+1. The humanized text
+2. An audit listing remaining AI tells
+3. Specific fix instructions
+
+Your job: apply ALL fixes while maintaining readability and meaning. This is your LAST CHANCE to make this text undetectable.
+
+FOCUS ESPECIALLY ON:
+- Burstiness: if any 3+ consecutive sentences are similar length, break them up aggressively
+- Perplexity: replace any remaining predictable phrases with surprising but natural alternatives  
+- Voice: if any section lacks personality, inject it
+- Turnitin's window analysis: ensure every 5-10 sentence window has high internal variance
+- QuillBot's pattern detection: eliminate any remaining predictable structure or generic language
+
+ALSO PRODUCE A CHANGES SUMMARY at the end, separated by "|||CHANGES|||":
+List the key changes made from the ORIGINAL text (not from the intermediate version), in short bullet-style lines.
+
+OUTPUT FORMAT:
+[final rewritten text]
+|||CHANGES|||
+[changes list, one per line, starting with •]`;
+
+  try {
+    // PASS 1: Deep humanization
+    showProgress(15);
+    const pass1 = await streamAPI(HUMANIZE_SYSTEM, `Rewrite this text to be completely undetectable by AI detectors:\n\n${text}`, outputEl, null);
+
+    // PASS 2: Audit
+    setStatus('Pass 2/3: Auditing for remaining AI tells...');
+    showProgress(50);
+    document.getElementById('pd1').className = 'phase-dot done';
+    document.getElementById('pd2').className = 'phase-dot active';
+    document.getElementById('phaseLabel').textContent = 'Auditing...';
+    
+    // Silent audit (don't stream to output)
+    const auditRes = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: MODEL, max_tokens: 4096,
+        system: AUDIT_SYSTEM,
+        messages: [{ role: 'user', content: `Audit this humanized text for remaining AI tells:\n\n${pass1}` }]
+      })
+    });
+
+    if (!auditRes.ok) throw new Error('Audit API call failed');
+    const auditData = await auditRes.json();
+    const auditText = auditData.content.map(c => c.text || '').join('');
+
+    let auditParsed;
+    try {
+      const cleaned = auditText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+      auditParsed = JSON.parse(cleaned);
+    } catch (e) {
+      const match = auditText.match(/\{[\s\S]*\}/);
+      if (match) auditParsed = JSON.parse(match[0]);
+      else auditParsed = { remaining_tells: [], fix_instructions: 'None needed', overall_pass_likelihood: '90' };
+    }
+
+    // PASS 3: Final revision with fixes
+    setStatus('Pass 3/3: Final revision pass (fixing ' + (auditParsed.remaining_tells?.length || 0) + ' remaining tells)...');
+    showProgress(75);
+    document.getElementById('pd2').className = 'phase-dot done';
+    document.getElementById('pd3').className = 'phase-dot active';
+    document.getElementById('phaseLabel').textContent = 'Final fixing...';
+    outputEl.textContent = '';
+
+    const finalPrompt = `HUMANIZED TEXT:\n${pass1}\n\nAUDIT RESULTS:\nRemaining tells: ${JSON.stringify(auditParsed.remaining_tells)}\nFix instructions: ${auditParsed.fix_instructions}\n\nORIGINAL TEXT (for changes comparison):\n${text}`;
+    
+    const finalResult = await streamAPI(FINAL_SYSTEM, finalPrompt, outputEl, null);
+
+    // Parse changes
+    const parts = finalResult.split('|||CHANGES|||');
+    const finalText = parts[0].trim();
+    const changesText = parts[1] || '';
+
+    outputEl.textContent = finalText;
+
+    // Show changes
+    if (changesText.trim()) {
+      const changesBox = document.getElementById('changesBox');
+      changesBox.classList.add('show');
+      const list = document.getElementById('changesList');
+      list.innerHTML = '';
+      changesText.trim().split('\n').filter(l => l.trim()).forEach(line => {
+        const el = document.createElement('div');
+        el.className = 'change-item';
+        el.textContent = line.trim();
+        list.appendChild(el);
+      });
+    }
+
+    // Update output word count
+    const outWords = finalText.split(/\s+/).filter(Boolean).length;
+    document.getElementById('outputWc').textContent = outWords + ' words';
+
+    showProgress(100);
+    setStatus(`Done — 3-pass humanization complete. Audit estimated ${auditParsed.overall_pass_likelihood}% detector bypass chance.`);
+    document.getElementById('pd3').className = 'phase-dot done';
+    document.getElementById('phaseLabel').textContent = 'Complete!';
+
+  } catch (err) {
+    setStatus('Error: ' + err.message, true);
+  } finally {
+    btn.classList.remove('loading'); btn.disabled = false;
+    setTimeout(hideProgress, 500);
+  }
+}
+</script>
+</body>
+</html>
