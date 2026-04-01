@@ -650,7 +650,7 @@ WRITE LIKE THE GOOD EXAMPLE, NOT THE BAD ONE.
 BANNED WORDS (never use): delve, leverage, tapestry, nuanced, foster, robust, beacon, pivotal, transformative, testament, vibrant, groundbreaking, showcasing, nestled, boasts, underscores, cultivating, encompassing, landscape (abstract), crucial, additionally, garner, intricate, interplay, align, enduring, enhance, vital role, evolving, streamline, seamless, cutting-edge, holistic, synergy, paradigm, stakeholder, optimize, deep dive, game-changer, staggering, remarkably, arguably, mind-blowing, revolutionized, arsenal, beasts
 
 BANNED HUMANIZER PHRASES (every tool uses these, detectors catch them):
-"You'd think X. Wrong." / "Think about it" / "We're talking X here" / "What strikes me" / "What's interesting is" / "But honestly," / "But here's the thing," / "Modern X? They're like Y." / "seemed like magic" / "the backbone of" / "His X was that good" / "literally + hyperbole" / "X-ray vision" / "another universe entirely" / "if you really think about it" / "crude by today's standards" / forced profanity for authenticity / "playing X guesswork" / "coin flip"
+"You'd think X. Wrong." / "Think about it" / "We're talking X here" / "What strikes me" / "What's interesting is" / "But honestly," / "But here's the thing," / "Modern X? They're like Y." / "seemed like magic" / "the backbone of" / "His X was that good" / "literally + hyperbole" / "another universe entirely" / "if you really think about it" / "crude by today's standards" / forced profanity for authenticity / "playing X guesswork" / "coin flip" / "sounds dramatic, right?" / "Picture this:" / "where things get interesting" / "where things get wild" / "where things get crazy" / "Mind-boggling" / "Mind-blowing" / "That's saying something" / "Brilliant in its simplicity" / "Frustrating doesn't begin to cover it" / "your friend" (direct reader address) / "now that's a story" / "worth every penny" / "Game changer" / "Let that sink in" / "Wrap your head around that" / "Not too shabby"
 
 BANNED STRUCTURES:
 - No bold section headers (use plain text or no headers)
@@ -679,7 +679,9 @@ DO THIS INSTEAD:
 - One or two moments of genuine personal reaction, not manufactured drama
 - Let the ending be specific and factual, not dramatic
 
-OUTPUT: Return ONLY the rewritten text. No preamble, no headers like "Here's the rewritten version:". Plain text only. No bold, no headers unless the original had them. Preserve meaning. Similar length (within 15%).`;
+OUTPUT: Return ONLY the rewritten text. No preamble, no headers like "Here's the rewritten version:". Plain text only. No bold, no headers unless the original had them. Preserve meaning. Similar length (within 15%). Use SINGLE blank lines between paragraphs, never double. No trailing newlines.
+
+CRITICAL ENFORCEMENT: If you find yourself writing ANY phrase from the banned lists above, STOP and rewrite that sentence completely. These bans are absolute. "Game changer", "mind-blowing", "mind-boggling", "the backbone of", "sounds dramatic", "Picture this", "where things get interesting", "where things get wild", "That's saying something", "Brilliant in its simplicity", "We're talking X here", "your friend" (direct address) — if ANY of these appear in your output, you have failed. Read your output once before returning it and remove every single one.`;
 
   const AUDIT_SYSTEM = `You are a ruthless AI-detection auditor. You've been given text that was humanized to bypass AI detectors. Your job: find EVERY remaining AI tell that GPTZero, Turnitin (including Jan 2026 update + anti-humanizer), Originality.ai, QuillBot, ZeroGPT, or Grammarly would flag.
 
@@ -801,7 +803,7 @@ OUTPUT FORMAT:
     const finalText = parts[0].trim();
     const changesText = parts[1] || '';
 
-    outputEl.textContent = finalText;
+    outputEl.textContent = finalText.replace(/\n{3,}/g, '\n\n').replace(/^\n+/, '');
 
     // Show changes
     if (changesText.trim()) {
