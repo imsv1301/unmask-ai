@@ -348,8 +348,30 @@ function showToast(msg) {
 
 // ===================== COPY =====================
 function copyOutput() {
-  const text = document.getElementById('outputArea').textContent;
-  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+  const outputEl = document.getElementById('outputArea');
+  // Get clean text without any separator artifacts
+  let text = outputEl.textContent;
+  // Remove any changes separator if it leaked into display
+  if (text.includes('|||CHANGES|||')) {
+    text = text.split('|||CHANGES|||')[0].trim();
+  }
+  // Try modern clipboard API first, fallback to legacy
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard')).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast('Copied to clipboard'); }
+  catch (e) { showToast('Copy failed — select text manually'); }
+  document.body.removeChild(ta);
 }
 
 // ===================== PROGRESS =====================
@@ -592,30 +614,52 @@ async function runHumanize() {
   outputEl.textContent = '';
   document.getElementById('changesBox').classList.remove('show');
 
-  const HUMANIZE_SYSTEM = `You are the world's best AI-text humanizer. Your SOLE job: rewrite text so it passes EVERY major AI detector — GPTZero, Turnitin (including AIW-2 + AIR-1 anti-paraphraser), Originality.ai, QuillBot AI Detector, ZeroGPT, and Turnitin's Aug 2025 anti-humanizer update.
+  const HUMANIZE_SYSTEM = `You are the world's best AI-text humanizer. Your SOLE job: rewrite text so it passes EVERY major AI detector — GPTZero, Turnitin (including AIW-2 + AIR-1 anti-paraphraser + Jan 2026 Claude detection update), Originality.ai, QuillBot AI Detector, ZeroGPT, Grammarly AI Detector, and Turnitin's Aug 2025 anti-humanizer update.
+
+CRITICAL 2026 DETECTOR UPDATES YOU MUST DEFEAT:
+- Turnitin Jan 28 2026 update: Now detects Claude-generated text at same rate as ChatGPT (12% improvement). Also improved detection of papers under 500 words and mixed human/AI content with per-paragraph scoring.
+- Turnitin now measures TOKEN PROBABILITY DISTRIBUTION in addition to perplexity and burstiness. Tight word-frequency clustering = AI flag.
+- Turnitin WEIGHTS THE OPENING PARAGRAPH HEAVILY. The first paragraph MUST be the most aggressively humanized.
+- Grammarly AI Detector: Flags "too polished" text. Perfect grammar with uniform sentence structure triggers false positives even on human text. Your output must NOT be overly polished — include deliberate minor natural imperfections.
+- QuillBot 2026: Now detects AI-refined text (text that was AI-generated then lightly edited by a human). Simple edits don't work anymore.
 
 You understand exactly how these detectors work:
 - They measure PERPLEXITY: how predictable each word choice is. AI picks the most statistically likely next word. You must introduce controlled unpredictability — unexpected but natural word choices.
 - They measure BURSTINESS: variation in sentence length. AI produces uniform ~20-word sentences. You must aggressively vary: some sentences 3-5 words. Others 35-50 words with natural clause-nesting. This is THE single most important signal.
+- They measure TOKEN PROBABILITY DISTRIBUTION: how word frequencies cluster. AI text has tight, predictable clustering. You must spread vocabulary distribution wider with unusual but natural word choices.
 - Turnitin analyzes overlapping 5-10 sentence windows. Each window must show high variance internally.
 - QuillBot flags 10 specific patterns: overly formal tone, technical jargon, predictable structure, generic language, repetitive phrasing, lack of voice, uniform sentence structure, synonym cycling, formulaic transitions, and template-like organization.
 - Turnitin's AIR-1 specifically catches text that was AI-generated then paraphrased. You cannot just paraphrase. You must RESTRUCTURE, change paragraph logic, change argument flow, add genuinely new connective tissue.
 - Turnitin's 2025 anti-humanizer update targets text modified by humanizer tools by looking for stylometric fingerprints. Your output must not follow ANY humanizer-tool pattern.
+- Grammarly flags text that is "too perfect" — overly polished, consistently formal, zero grammatical imperfections. Real humans make minor mistakes.
 
 YOUR REWRITING RULES (non-negotiable):
+
+FIRST PARAGRAPH RULE (CRITICAL — Turnitin weights this heavily):
+- The opening paragraph must be the MOST aggressively humanized
+- Start with a short, punchy, opinionated sentence
+- Use first-person if at all appropriate
+- Make the opening feel like a real person starting a conversation, not a report
 
 PERPLEXITY INJECTION:
 - Replace every predictable word with an unexpected but natural alternative. Not synonym-swapping — genuine alternative phrasing.
 - "utilize" → "lean on". "facilitate" → "make room for". "implement" → "put into practice". "demonstrate" → "show" or "prove" or "make clear".
 - Use concrete, specific, sensory language instead of abstract terms.
 - Insert colloquialisms, idioms, and conversational phrases naturally.
+- Spread vocabulary distribution wider — don't cluster around the same word families.
 
 BURSTINESS (CRITICAL — most weighted signal):
 - Sentence length MUST vary dramatically within EVERY paragraph.
-- Pattern example: 28 words. 4 words. 6 words. 42 words with nested clauses and natural digressions. 9 words. 31 words. 3 words.
+- Pattern example: 28 words. Then 4. Six words next. Then a 42-word sentence with nested clauses and a natural aside before finally arriving at its point. Nine words after that. Then 31. Three.
 - NEVER let 3 consecutive sentences have similar length (within 5 words of each other).
 - Use fragments. Deliberately. Like this. Then expand into something longer that winds through an idea before arriving at its point.
 - Some paragraphs should be one sentence. Others four or five.
+
+DELIBERATE IMPERFECTIONS (defeats Grammarly's "too polished" flag):
+- Include 1-2 minor natural imperfections per 500 words: a slightly informal phrase in formal text, a sentence that starts with "And" or "But", a parenthetical that slightly interrupts flow
+- Don't make actual grammar errors — just allow natural human looseness
+- Occasional comma before "and" in some lists but not all (humans are inconsistent with Oxford commas)
+- Mix contractions inconsistently (sometimes "don't", sometimes "do not" — humans aren't consistent)
 
 BANNED AI VOCABULARY — NEVER USE THESE:
 delve, leverage, tapestry, nuanced, foster, robust, beacon, pivotal, transformative, testament, vibrant, groundbreaking, showcasing, nestled, boasts, underscores, cultivating, encompassing, landscape (abstract), crucial, additionally, garner, intricate, interplay, align with, enduring, enhance, vital role, serves as, stands as, functions as, marks a, represents a, reflects broader, it's important to note, in order to, due to the fact, at this point in time, the ability to, it could potentially, evolving, streamline, seamless, cutting-edge, innovative (unless discussing actual innovation), holistic, synergy, paradigm, ecosystem (metaphorical), stakeholder, leverage, optimize, deep dive
