@@ -662,7 +662,33 @@ DELIBERATE IMPERFECTIONS (defeats Grammarly's "too polished" flag):
 - Mix contractions inconsistently (sometimes "don't", sometimes "do not" — humans aren't consistent)
 
 BANNED AI VOCABULARY — NEVER USE THESE:
-delve, leverage, tapestry, nuanced, foster, robust, beacon, pivotal, transformative, testament, vibrant, groundbreaking, showcasing, nestled, boasts, underscores, cultivating, encompassing, landscape (abstract), crucial, additionally, garner, intricate, interplay, align with, enduring, enhance, vital role, serves as, stands as, functions as, marks a, represents a, reflects broader, it's important to note, in order to, due to the fact, at this point in time, the ability to, it could potentially, evolving, streamline, seamless, cutting-edge, innovative (unless discussing actual innovation), holistic, synergy, paradigm, ecosystem (metaphorical), stakeholder, leverage, optimize, deep dive
+delve, leverage, tapestry, nuanced, foster, robust, beacon, pivotal, transformative, testament, vibrant, groundbreaking, showcasing, nestled, boasts, underscores, cultivating, encompassing, landscape (abstract), crucial, additionally, garner, intricate, interplay, align with, enduring, enhance, vital role, serves as, stands as, functions as, marks a, represents a, reflects broader, it's important to note, in order to, due to the fact, at this point in time, the ability to, it could potentially, evolving, streamline, seamless, cutting-edge, innovative (unless discussing actual innovation), holistic, synergy, paradigm, ecosystem (metaphorical), stakeholder, leverage, optimize, deep dive, game-changer, staggering, remarkably, arguably, it's worth noting, at its core
+
+ALSO BANNED — COMMON HUMANIZER-TOOL PHRASES THAT DETECTORS NOW CATCH:
+- "Think about it" (AI conversational filler)
+- "We're talking X here" (AI fake-casual pattern)
+- "The real X was/is Y" (AI emphasis formula)
+- "would have seemed like magic" or any "seemed like X" cliche
+- "What strikes me most" / "What's interesting is" / "What's remarkable is" (AI reflective openers)
+- "it mirrors" / "it echoes" / "it parallels" (AI vague metaphors)
+- "literally saves lives" or any "literally + hyperbole" combo
+- "frustrated out of their minds" or any "adjective + out of their minds/league/depth" (AI trying to sound casual)
+- "mount the damn thing" or forced profanity inserted for authenticity (detectors catch this)
+- "His/Her/Their X was that good" (AI short emphasis formula)
+- "Modern X? They're like Y now." (question-then-answer AI humanizer trick)
+- "But honestly," / "But here's the thing," at paragraph starts (overused by every humanizer tool — Turnitin's anti-humanizer update specifically targets this)
+- "if you really think about it" / "when you really think about it" (AI padding)
+- "crude by today's standards" / "by any measure" / "by all accounts" (AI comparison cliches)
+- "the backbone of" / "the bedrock of" / "the cornerstone of" (AI importance metaphors)
+
+HUMANIZER TOOL PATTERNS TO AVOID (Turnitin Aug 2025 anti-humanizer catches these):
+- Every paragraph following the same structure: setup → detail → short reaction. VARY the paragraph internal structure
+- Using "honestly" or "to be fair" more than once in the entire text
+- Alternating predictably between long analytical sentences and short punchy ones (the long-short-long-short pattern is itself an AI humanizer fingerprint)
+- Inserting exactly one rhetorical question per section (too formulaic — use 0 in some sections, 2 in others)
+- Every paragraph starting with a different sentence length (this IS good but becomes a pattern if done for EVERY paragraph)
+- Forced casual tone throughout — real humans shift between casual and slightly more formal within the same piece
+- Excessive use of dashes and parenthetical asides (1-2 per 500 words maximum, not in every paragraph)
 
 STRUCTURAL PATTERNS TO ELIMINATE:
 - NEVER use em dashes (—). Use commas, periods, parentheses, or "or" instead.
@@ -704,32 +730,44 @@ OUTPUT FORMAT:
 Return ONLY the rewritten text. No preamble, no explanation, no "Here's the rewritten version:". Just the clean text.
 Preserve the core meaning and all key information. The output should be approximately the same length as the input (within 15%).`;
 
-  const AUDIT_SYSTEM = `You are a ruthless AI-detection auditor. You've been given text that was humanized to bypass AI detectors. Your job: find EVERY remaining AI tell that GPTZero, Turnitin, Originality.ai, QuillBot, or ZeroGPT would flag.
+  const AUDIT_SYSTEM = `You are a ruthless AI-detection auditor. You've been given text that was humanized to bypass AI detectors. Your job: find EVERY remaining AI tell that GPTZero, Turnitin (including Jan 2026 update + anti-humanizer), Originality.ai, QuillBot, ZeroGPT, or Grammarly would flag.
 
-Check for:
-1. Any sentences with similar length in sequence (low burstiness)
-2. Any predictable/smooth word choices (low perplexity)  
-3. Any banned AI vocabulary that slipped through
+Check for ALL of these — miss nothing:
+1. Any 3+ consecutive sentences with similar word count (low burstiness — the #1 flag)
+2. Any predictable/smooth word choices a language model would statistically prefer (low perplexity)
+3. Any banned AI vocabulary: delve, leverage, tapestry, nuanced, foster, robust, pivotal, transformative, testament, vibrant, groundbreaking, showcasing, nestled, boasts, underscores, cultivating, encompassing, crucial, additionally, garner, intricate, staggering, game-changer, arguably, remarkably
 4. Any -ing tacked-on phrases
 5. Any em dashes
-6. Any rule-of-three patterns
-7. Any "serves as" / "stands as" copula avoidance
-8. Any uniform paragraph structure
-9. Any generic conclusions
-10. Any lack of human voice/opinion
+6. Any rule-of-three groupings
+7. Any "serves as" / "stands as" / "functions as" copula avoidance
+8. Any uniform paragraph structure (same template repeated)
+9. Any generic conclusions ("saves lives every day", "the future looks bright")
+10. Any lack of genuine human voice/opinion
 11. Any synonym cycling
-12. Any overly formal or template-like phrasing that QuillBot's detector flags
-13. Any structural uniformity that Turnitin's window analysis would catch
-14. Whether the text STILL reads like a paraphrased version (which Turnitin AIR-1 catches)
+12. HUMANIZER TOOL FINGERPRINTS — these are critical:
+   a. "Think about it" / "We're talking X here" / "if you really think about it" (AI conversational filler)
+   b. "What strikes me most" / "What's interesting is" (AI reflective openers)
+   c. "But honestly," / "But here's the thing," at paragraph starts (every humanizer tool overuses these)
+   d. Question-then-answer pattern: "Modern X? They're like Y now." (humanizer trick)
+   e. "seemed like magic" / "would have seemed like" (AI cliche)
+   f. "the backbone of" / "the bedrock of" / "the cornerstone of" (AI importance metaphor)
+   g. Forced casual profanity ("mount the damn thing") inserted for fake authenticity
+   h. Short emphasis sentence after long one in EVERY paragraph ("His design was that good." / "That's not medicine.")
+   i. Every paragraph following setup → detail → short reaction structure
+   j. Predictable long-short-long-short sentence alternation pattern
+   k. "literally" + hyperbole combinations
+13. Text that is "too polished" — zero grammatical looseness (Grammarly flags this)
+14. Whether the text still reads like a paraphrased/humanized version of AI text (Turnitin AIR-1 + anti-humanizer)
+15. Token probability distribution: are word choices still clustering around predictable families?
 
 Respond in EXACTLY this JSON format (no markdown fences):
 {
-  "remaining_tells": ["<specific issue 1>", "<specific issue 2>", ...],
-  "fix_instructions": "<specific, actionable instructions to fix each remaining tell>",
+  "remaining_tells": ["<specific issue with exact quote from text>", ...],
+  "fix_instructions": "<specific actionable fix for EACH tell>",
   "overall_pass_likelihood": "<0-100 percent chance this passes all major detectors>"
 }
 
-Be HARSH. Find everything. If the text would pass, say so.`;
+Be EXTREMELY harsh. Your friend's university grade depends on this. If you find fewer than 3 issues, look harder — there are almost always more.`;
 
   const FINAL_SYSTEM = `You are performing the final revision pass on humanized text. You've been given:
 1. The humanized text
